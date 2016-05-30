@@ -244,9 +244,9 @@ worker
 
 
 ## Compatibility
-| IE | Edge | Firefox | Chrome | Safari | Android |
-|----|------|---------|--------|--------|---------|
-| 10 | Yes  | Yes     | Yes    | Yes    | 5       |
+| IE | Edge | Firefox | Chrome | Safari | Safari  iOS | Android |
+|----|------|---------|--------|--------|-------------|---------|
+| 10 | Yes  | 6       | 23     | 6      | 6.1         | 5       |
 
 
 ## License
