@@ -11,6 +11,7 @@ const watchify    = require('watchify');
 const browserify  = require('browserify');
 const notify      = require('gulp-notify');
 const gutil       = require('gulp-util');
+const derequire   = require('gulp-derequire');
 const packageJson = require('./package');
 
 
@@ -48,6 +49,7 @@ gulp.task('scripts', () => {
 		.on('error', notify.onError('Error: <%= error.message %>'))
 		.pipe(source(`${packageJson.name}.js`))
 		.pipe(buffer())
+		.pipe(derequire())
 
 		// Normal JS build
 		.pipe(gulp.dest(paths.scripts.dest))
