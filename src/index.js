@@ -76,7 +76,7 @@ class MultiWorker {
 	 * @param {function} [callback]
 	 * @returns {MultiWorker}
 	 *
-	 * @eample
+	 * @example
 	 *       // Wait for post to return, then terminate
 	 *     worker.post(10).terminate();
 	 *
