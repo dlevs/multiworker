@@ -18,14 +18,15 @@ const packageJson = require('./package');
 //------------------------------------------------
 const paths             = {
 	scripts: {
-		src:  'src/build.js',
+		src:  'src/index.js',
 		dest: 'dist'
 	}
 };
 const browserifyOptions = Object.assign({}, watchify.args, {
-	entries: paths.scripts.src,
-	debug:   true,
-	plugin:  [watchify]
+	entries:    paths.scripts.src,
+	debug:      true,
+	plugin:     [watchify],
+	standalone: 'MultiWorker'
 });
 
 
