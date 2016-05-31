@@ -1,6 +1,6 @@
 {
   "name": "multiworker",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Wrapper to make web workers easy.",
   "main": "dist/multiworker.js",
   "repository": {
