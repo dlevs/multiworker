@@ -4,6 +4,11 @@ MultiWorker is a wrapper around the browser's native web worker API. Features in
 - Queue processes across multiple worker threads.
 - Build workers from functions, instead of needing a separate JS file.
 
+## Summary
+```bash
+npm install --save multiworker
+```
+
 ## Usage
 ### Basic usage
 A MultiWorker instance is created with a function which is used as the code for the worker.
