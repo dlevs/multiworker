@@ -10,8 +10,12 @@ Install via NPM:
 ```bash
 npm install --save multiworker
 ```
+Then use in your script:
+```js
+var MultiWorker = require('multiworker');
+```
 
-Or include the old fashioned way:
+Or, include the script the old fashioned way to make the MultiWorker constructor available globally:
 ```HTML
 <script src="dist/multiworker.min.js"></script>
 ```
