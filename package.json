@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Wrapper to make web workers easy.",
   "main": "dist/multiworker.js",
-  "module: "src/index.js",
+  "module": "src/index.js",
   "type": "module",
   "repository": {
     "type": "git",
