@@ -53,13 +53,15 @@ class MultiWorker {
    * by an optional callback to deal with the response from the worker.
    *
    * @param {...*} arguments
-   * @param {Function} callback
+   * @param {Function} [callback]
+   * @param {Array<Transferable>} [transfers]
    * @returns {MultiWorker}
    */
   post(...args) {
+    const transfers = Array.isArray(args[args.length - 1]) ? args.pop() : undefined;
     const cb = typeof args[args.length - 1] === 'function' ? args.pop() : this.callback;
 
-    this._process(args, cb);
+    this._process(args, cb, transfers);
 
     return this;
   }
@@ -113,11 +115,14 @@ class MultiWorker {
     this._processQueue();
   }
 
-  _process(args, cb) {
+  _process(args, cb, transfers) {
     const worker = this._availableWorker;
-    const post = new Post();
+    const post = new Post(transfers);
 
-    args.push(post);
+    const payload = {
+      args: args,
+      post: post
+    }
 
     if (this.ready && worker) {
       this._inProgressData[post.id] = {
@@ -125,11 +130,11 @@ class MultiWorker {
         worker,
       };
 
-      worker.postMessage(args);
+      worker.postMessage(payload, transfers);
       _isWorkerBusy.set(worker, true);
       this.processCount++;
     } else {
-      this.queue.push([args, cb]);
+      this.queue.push([args, cb, transfers]);
     }
   }
 
@@ -158,7 +163,7 @@ class MultiWorker {
    * @param event
    */
   static _defaultMessageEvent(event) {
-    const post = event.data.pop();
+    const post = event.data.post;
     const { cb } = this._inProgressData[post.id];
     const context = new WorkerMessage(this, post, event);
 
@@ -166,7 +171,7 @@ class MultiWorker {
       this._processFinished(post.id);
     }
 
-    cb.apply(context, event.data);
+    cb.apply(context, event.data.args);
 
     if (post.done) {
       this._processQueue();

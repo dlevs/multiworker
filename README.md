@@ -39,6 +39,22 @@ worker.post(5, function (n) {
     console.log(n); // => 6
 });
 ```
+Both `worker.post()` and `self.return()` can receive an array of transfers, so Transferables can be used as arguments.
+``` js
+var worker = new MultiWorker(function () {
+    self.receive = function (inputBuffer) {
+        // Worker now has ownership of the input buffer
+        var resultBuffer = inputBuffer
+        self.return(resultBuffer, [resultBuffer]);
+        // Ownership of the result buffer has been transferred to the main thread
+    }
+});
+var inputBuffer = new ArrayBuffer(5);
+worker.post(inputBuffer, function(resultBuffer) {
+    // Main thread now has ownership of the result buffer
+});
+// Ownership of the input buffer has been transferred to the worker
+```
 
 ## Options
 ### worker

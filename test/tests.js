@@ -325,6 +325,29 @@ describe('Worker functionality', () => {
         .terminate();
     });
   });
+
+  describe('Transferables', () => {
+    it('accepts transfers as last argument to post and return', (next) => {
+      var inputBuffer = new ArrayBuffer(8);
+      const worker = new MultiWorker({
+        worker: () => {
+          self.receive = function (buffer) {
+            self.return(buffer, buffer.byteLength, [buffer]);
+          };
+        }
+      });
+
+      worker
+        .post(inputBuffer, (resultBuffer, receivedByteLength) => {
+          resultBuffer.should.be.instanceof(ArrayBuffer);
+          receivedByteLength.should.equal(8);
+          resultBuffer.byteLength.should.equal(8);
+          inputBuffer.byteLength.should.equal(0);
+          next();
+        }, [inputBuffer])
+        .terminate();
+    });
+  });
 });
 
 if (globalThis.RUN_IN_BROWSER) {
