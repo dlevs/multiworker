@@ -19,10 +19,14 @@ class MultiWorker {
    * in the workers. These functions must be named and not make references to data outside the
    * function scope.
    */
-  constructor(options) {
-    // Get the worker code
-    //--------------------------------------------------
-    const worker = (options.worker !== undefined) ? options.worker : options;
+  constructor(worker, options) {
+    if (typeof worker === 'string' || typeof worker === 'function') {
+      options = options || {};
+      options.worker = worker;
+    } else {
+      options = worker;
+    }
+    worker = (options.worker !== undefined) ? options.worker : options;
 
     if (typeof worker === 'string') {
       get(worker, (text) => {
@@ -30,7 +34,10 @@ class MultiWorker {
         this._init();
       });
     } else if (typeof worker === 'function') {
-      this.worker = functionToInstantString(worker);
+      setTimeout(() => {
+        this.worker = functionToInstantString(worker);
+        this._init();
+      });
     }
 
     // Set properties from settings
@@ -42,10 +49,6 @@ class MultiWorker {
     // Set generic properties
     //--------------------------------------------------
     this._initProperties();
-
-    // Init if worker is available
-    //--------------------------------------------------
-    if (this.worker) this._init();
   }
 
   /**

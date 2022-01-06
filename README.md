@@ -82,6 +82,12 @@ var worker = new MultiWorker({
     }
 });
 ```
+
+The worker url can also be passed as first argument, and all other options in an object literal as second argument:
+``` js
+var worker = new MultiWorker('workers/example.js', { threads: 2 });
+```
+
 ### callback
 A function to be called whenever a worker sends a value back to the main program via self.post or self.return.
 ``` js

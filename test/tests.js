@@ -38,6 +38,18 @@ describe('Worker functionality', () => {
         .terminate();
     });
 
+    it('...passing url and options to constructor', (next) => {
+      const worker = new MultiWorker(new URL('./worker.js', import.meta.url).href, { threads: 2 });
+
+      worker.threads.should.equal(2);
+      worker
+        .post('blah', (a) => {
+          a.should.equal('blah');
+          next();
+        })
+        .terminate();
+    });
+
     it('...passing an options object to constructor with a worker function', (next) => {
       const worker = new MultiWorker({
         worker: simpleReturn,
@@ -86,7 +98,7 @@ describe('Worker functionality', () => {
         })
         .terminate();
 
-      worker.queue.length.should.equal(4);
+      worker.queue.length.should.equal(5);
     });
 
     it('post method works', (next) => {
@@ -129,19 +141,23 @@ describe('Worker functionality', () => {
     });
 
     describe('terminate method works', () => {
-      it('basic functionality works', () => {
+      it('basic functionality works', (next) => {
         const worker = new MultiWorker({
           worker: simpleReturn,
           threads: 2,
         });
 
-        worker.workerList.length.should.equal(2);
-        worker.workerList[0].should.be.instanceof(Worker);
+        setTimeout(() => {
+          worker.workerList.length.should.equal(2);
+          worker.workerList[0].should.be.instanceof(Worker);
+  
+          worker.terminate();
+  
+          worker.workerList.length.should.equal(0);
+          expect(worker.workerList[0]).to.be.undefined;
+          next();
+        });
 
-        worker.terminate();
-
-        worker.workerList.length.should.equal(0);
-        expect(worker.workerList[0]).to.be.undefined;
       });
 
       it('will wait until all processes end to terminate, then run callback', (next) => {
@@ -159,7 +175,9 @@ describe('Worker functionality', () => {
             next();
           });
 
-        worker.workerList.length.should.equal(1);
+        setTimeout(() => {
+          worker.workerList.length.should.equal(1);
+        }, 0);
       });
 
       it('will terminate instantly if true is passed', (next) => {
