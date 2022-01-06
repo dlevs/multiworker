@@ -1,4 +1,4 @@
-'use strict';
+import fetch from 'cross-fetch';
 
 /**
  * Returns a self-invoking, string representation of a function
@@ -7,7 +7,7 @@
  * @returns {String}
  */
 export function functionToInstantString(func) {
-	return '(' + func.toString() + ')();';
+  return `(${func.toString()})();`;
 }
 
 /**
@@ -18,7 +18,7 @@ export function functionToInstantString(func) {
  * @returns {String}
  */
 export function stringifyFunctionList(array) {
-	return array.reduce((prev, next) => prev + next.toString() + ';', '');
+  return array.reduce((prev, next) => `${prev + next.toString()};`, '');
 }
 
 /**
@@ -34,13 +34,17 @@ export function noop() {
  * @param {Function} success
  */
 export function get(url, success) {
-	const xhr = new XMLHttpRequest();
-
-	xhr.onreadystatechange = () => {
-		if (xhr.readyState === 4 && xhr.status === 200) {
-			success(xhr.responseText)
-		}
-	};
-	xhr.open('GET', url, true);
-	xhr.send();
+  fetch(url).then((response) => response.text()).then(success).catch(e => {
+    if (url.startsWith('file://')) {
+      url = url.substr(7);
+    }
+    import('fs').then(fs => {
+      fs.readFile(url, 'utf8', (err, data) => {
+        if (err) {
+          throw err;
+        };
+        success(data);
+      });
+    }).catch(e => {throw e});
+  });
 }
