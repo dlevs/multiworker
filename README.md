@@ -1,5 +1,5 @@
 ## Summary
-MultiWorker is a wrapper around the browser's native web worker API. Features include:
+MultiWorker is a wrapper around node's and the browser's native (web) worker API. Features include:
 - Post data to workers and use callbacks to handle results.
 - Queue processes across multiple worker threads.
 - Build workers from functions, instead of needing a separate JS file.
@@ -12,12 +12,12 @@ npm install --save multiworker
 ```
 Then use in your script:
 ```js
-var MultiWorker = require('multiworker');
+import MultiWorker from 'multiworker';
 ```
 
 Or, include the script the old fashioned way to make the MultiWorker constructor available globally:
 ```HTML
-<script src="dist/multiworker.min.js"></script>
+<script src="dist/multiworker.js"></script>
 ```
 
 ## Usage
@@ -38,6 +38,22 @@ which returns a value with self.return.
 worker.post(5, function (n) {
     console.log(n); // => 6
 });
+```
+Both `worker.post()` and `self.return()` can receive an array of transfers, so Transferables can be used as arguments.
+``` js
+var worker = new MultiWorker(function () {
+    self.receive = function (inputBuffer) {
+        // Worker now has ownership of the input buffer
+        var resultBuffer = inputBuffer
+        self.return(resultBuffer, [resultBuffer]);
+        // Ownership of the result buffer has been transferred to the main thread
+    }
+});
+var inputBuffer = new ArrayBuffer(5);
+worker.post(inputBuffer, function(resultBuffer) {
+    // Main thread now has ownership of the result buffer
+});
+// Ownership of the input buffer has been transferred to the worker
 ```
 
 ## Options
@@ -66,6 +82,12 @@ var worker = new MultiWorker({
     }
 });
 ```
+
+The worker url can also be passed as first argument, and all other options in an object literal as second argument:
+``` js
+var worker = new MultiWorker('workers/example.js', { threads: 2 });
+```
+
 ### callback
 A function to be called whenever a worker sends a value back to the main program via self.post or self.return.
 ``` js
@@ -257,13 +279,21 @@ worker
         .post(); // This second post won't execute until self.return is called in response to the previous post.
 ```
 
+## Developing
 
+To continuously run the tests while editing, run
 
-## Compatibility
-| IE | Edge | Firefox | Chrome | Safari | Safari  iOS | Android |
-|----|------|---------|--------|--------|-------------|---------|
-| 10 | Yes  | 6       | 23     | 6      | 6.1         | 5       |
+    npm start
 
+and open your browser on http://localhost:3000.
+
+To build the standalone version, run
+
+    npm run build
+
+To ensure correct code style and that the library runs both in node and browsers, run
+
+    npm test
 
 ## License
 This project is licensed under the ISC License - see the [LICENSE.md](LICENSE.md) file for details
